@@ -44,3 +44,20 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+////////////////////////////////////
+
+### OMDb API Pagination Limit
+
+The OMDb API always returns **10 results per request**, regardless of the page size requested by the client.  
+Because of this limitation, the backend page size is fixed and cannot be changed.
+
+The “Items per page” selector in the UI (10 / 20 / 50) is therefore applied **only to the client-side pagination layer**.  
+It affects how many results the user sees per page, but the application still fetches data from OMDb in fixed batches of 10 items per API call.
+
+This behavior is intentional and documented here to clarify the difference between:
+
+- **backend pagination (fixed at 10 items)**
+- **frontend logical pagination (adjustable by the user)**
+
+The UI remains consistent and predictable, while working within the constraints of the OMDb API.

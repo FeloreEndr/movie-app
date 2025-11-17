@@ -1,0 +1,1 @@
+export const MovieDetailsPage = () => <h1>MovieDetailsPage</h1>
