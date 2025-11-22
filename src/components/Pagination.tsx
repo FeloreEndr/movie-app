@@ -1,4 +1,12 @@
 import React from "react";
+import {
+    Wrapper,
+    PageSizeWrapper,
+    PageSizeSelect,
+    Controls,
+    Button,
+    Info,
+} from "./styles";
 
 interface PaginationProps {
     currentPage: number;
@@ -9,16 +17,16 @@ interface PaginationProps {
     onPageSizeChange: (pageSize: number) => void;
 }
 
-const defaultOptions = [10, 20, 50];
+const defaultOptions = [5, 10];
 
 export default function Pagination({
-        currentPage,
-        totalResults,
-        pageSize,
-        pageSizeOptions = defaultOptions,
-        onPageChange,
-        onPageSizeChange,
-    }: PaginationProps) {
+   currentPage,
+   totalResults,
+   pageSize,
+   pageSizeOptions = defaultOptions,
+   onPageChange,
+   onPageSizeChange,
+}: PaginationProps) {
     const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
 
     const canGoPrev = currentPage > 1;
@@ -31,11 +39,10 @@ export default function Pagination({
     };
 
     return (
-        <nav aria-label="Pagination" className="pagination">
-            <div className="pagination__page-size">
-                <label htmlFor="pageSizeSelect">Items per page:</label>
-                <select
-                    id="pageSizeSelect"
+        <Wrapper aria-label="Pagination">
+            <PageSizeWrapper>
+                <span>Items per page:</span>
+                <PageSizeSelect
                     value={pageSize}
                     onChange={handlePageSizeChange}
                 >
@@ -44,22 +51,28 @@ export default function Pagination({
                             {opt}
                         </option>
                     ))}
-                </select>
-            </div>
+                </PageSizeSelect>
+            </PageSizeWrapper>
 
-            <div className="pagination__controls">
-                <button onClick={() => onPageChange(currentPage - 1)} disabled={!canGoPrev}>
+            <Controls>
+                <Button
+                    onClick={() => onPageChange(currentPage - 1)}
+                    disabled={!canGoPrev}
+                >
                     Prev
-                </button>
+                </Button>
 
-                <span>
-                  Page {currentPage} / {totalPages}
-                </span>
+                <Info>
+                    Page {currentPage} / {totalPages}
+                </Info>
 
-                <button onClick={() => onPageChange(currentPage + 1)} disabled={!canGoNext}>
+                <Button
+                    onClick={() => onPageChange(currentPage + 1)}
+                    disabled={!canGoNext}
+                >
                     Next
-                </button>
-            </div>
-        </nav>
+                </Button>
+            </Controls>
+        </Wrapper>
     );
 }

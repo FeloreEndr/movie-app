@@ -2,19 +2,19 @@ import { useState } from "react";
 import SearchForm from "./components/SearchForm";
 import MovieList from "./components/MovieList";
 import Pagination from "../../components/Pagination";
-import { useMoviesSearch, SearchParams } from "../../hooks/useMoviesSearch";
+import { useQuery, SearchParams } from "../../hooks/useQuery";
 
 export default function HomePage() {
     const [params, setParams] = useState<SearchParams>({
         title: "",
         year: "",
         type: "",
-        page: 1
+        page: 1,
     });
 
     const [pageSize, setPageSize] = useState<number>(10);
 
-    const { data, total, loading, error } = useMoviesSearch(params);
+    const { data, total, loading, error } = useQuery(params);
 
     const handleSearch = (p: { title: string; year: string; type: string }) => {
         setParams({ ...p, page: 1 });
@@ -30,6 +30,8 @@ export default function HomePage() {
 
     const hasSearched = params.title !== "";
 
+    const visibleMovies = data.slice(0, pageSize);
+
     return (
         <main>
             <h1>Movie search</h1>
@@ -39,12 +41,12 @@ export default function HomePage() {
             <section aria-live="polite">
                 {loading && <p>Loading...</p>}
                 {error && !loading && <p role="alert">{error}</p>}
-                {!loading && !error && hasSearched && data.length === 0 && (
+                {!loading && !error && hasSearched && visibleMovies.length === 0 && (
                     <p>No results found.</p>
                 )}
             </section>
 
-            {!error && <MovieList movies={data} />}
+            {!error && <MovieList movies={visibleMovies} />}
 
             {hasSearched && total > 0 && (
                 <Pagination

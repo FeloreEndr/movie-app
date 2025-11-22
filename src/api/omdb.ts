@@ -1,19 +1,7 @@
+import type { SearchResponse, MovieDetails } from "./types";
+
 const API_URL = "http://www.omdbapi.com/";
-
-export interface MovieItem {
-    imdbID: string;
-    Title: string;
-    Year: string;
-    Type: string;
-    Poster: string;
-}
-
-export interface SearchResponse {
-    Search?: MovieItem[];
-    totalResults?: string;
-    Response: "True" | "False";
-    Error?: string;
-}
+const API_KEY = process.env.REACT_APP_OMDB_API_KEY ?? "dd5ad32b";
 
 export async function searchMovies(
     title: string,
@@ -22,7 +10,7 @@ export async function searchMovies(
     page: number
 ): Promise<SearchResponse> {
     const params = new URLSearchParams({
-        apikey: process.env.REACT_APP_OMDB_API_KEY!,
+        apikey: API_KEY,
         s: title,
         page: String(page),
     });
@@ -31,5 +19,31 @@ export async function searchMovies(
     if (type) params.append("type", type);
 
     const res = await fetch(`${API_URL}?${params.toString()}`);
-    return res.json();
+    const json = (await res.json()) as SearchResponse;
+
+    if (json.Response === "False") {
+        throw new Error(json.Error || "Unknown error");
+    }
+
+    return json;
+}
+
+export async function getMovieDetails(imdbID: string): Promise<MovieDetails> {
+    const params = new URLSearchParams({
+        apikey: API_KEY,
+        i: imdbID,
+        plot: "full",
+    });
+
+    const res = await fetch(`${API_URL}?${params.toString()}`);
+    const json = (await res.json()) as MovieDetails & {
+        Response?: "True" | "False";
+        Error?: string;
+    };
+
+    if (json.Response === "False") {
+        throw new Error(json.Error || "Movie not found");
+    }
+
+    return json as MovieDetails;
 }

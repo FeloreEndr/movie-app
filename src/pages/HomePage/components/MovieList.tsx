@@ -1,26 +1,70 @@
-import { MovieItem } from "../../../api/omdb";
-import { Link } from "react-router-dom";
+import type { MovieItem } from "../../../api/types";
+import { useFavorites } from "../../../context/FavoritesContext";
+import {
+    ListSection,
+    Grid,
+    Card,
+    PosterWrapper,
+    Poster,
+    CardBody,
+    Title,
+    Meta,
+    CardActions,
+    DetailsLink,
+    FavoriteButton
+} from './styles'
 
 interface Props {
     movies: MovieItem[];
 }
 
 export default function MovieList({ movies }: Props) {
-    return (
-        <div className="movie-list">
-            {movies.map((m) => (
-                <div key={m.imdbID} className="movie-card">
-                    <img
-                        src={m.Poster !== "N/A" ? m.Poster : "/placeholder.png"}
-                        alt={`${m.Title} poster`}
-                    />
-                    <h3>{m.Title}</h3>
-                    <p>{m.Year}</p>
-                    <p>{m.Type}</p>
+    const { isFavorite, toggleFavorite } = useFavorites();
 
-                    <Link to={`/movie/${m.imdbID}`}>Details</Link>
-                </div>
-            ))}
-        </div>
+    if (movies.length === 0) return null;
+
+    return (
+        <ListSection aria-label="Search results">
+            <Grid>
+                {movies.map((m) => {
+                    const favorite = isFavorite(m.imdbID);
+
+                    return (
+                        <Card key={m.imdbID}>
+                            <PosterWrapper>
+                                {m.Poster !== "N/A" ? (
+                                    <Poster src={m.Poster} alt={`${m.Title} poster`} />
+                                ) : null}
+                            </PosterWrapper>
+
+                            <CardBody>
+                                <Title>{m.Title}</Title>
+                                <Meta>
+                                    {m.Year} · {m.Type}
+                                </Meta>
+
+                                <CardActions>
+                                    <DetailsLink to={`/movie/${m.imdbID}`}>Details</DetailsLink>
+                                    <FavoriteButton
+                                        type="button"
+                                        onClick={() =>
+                                            toggleFavorite({
+                                                imdbID: m.imdbID,
+                                                Title: m.Title,
+                                                Year: m.Year,
+                                                Type: m.Type,
+                                                Poster: m.Poster,
+                                            })
+                                        }
+                                    >
+                                        {favorite ? "Remove from favorites" : "Add to favorites"}
+                                    </FavoriteButton>
+                                </CardActions>
+                            </CardBody>
+                        </Card>
+                    );
+                })}
+            </Grid>
+        </ListSection>
     );
 }
