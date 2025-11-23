@@ -3,7 +3,6 @@ import { useMovieDetails } from "./useMovieDetails";
 import { getMovieDetails } from "../api/omdb";
 import type { MovieDetails } from "../api/types";
 
-// mock API
 jest.mock("../api/omdb");
 
 const mockMovie: MovieDetails = {
@@ -38,7 +37,7 @@ describe("useMovieDetails", () => {
     it("loads movie details successfully", async () => {
         (getMovieDetails as jest.Mock).mockResolvedValue(mockMovie);
 
-        const { result, rerender } = renderHook(
+        const { result } = renderHook(
             (id) => useMovieDetails(id),
             { initialProps: "tt0372784" }
         );
